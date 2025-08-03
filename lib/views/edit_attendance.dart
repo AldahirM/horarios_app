@@ -22,14 +22,14 @@ class _AttendanceEditState extends State<AttendanceEdit> {
     final int id = args['id'];
     final DateTime date = args['date'];
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Editar Asistencia'),
-      ),
+      appBar: AppBar(title: const Text('Editar Asistencia')),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
+            const Text("Editar Asistencia", style: TextStyle(fontSize: 24)),
+            SizedBox(height: 30),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
@@ -62,6 +62,7 @@ class _AttendanceEditState extends State<AttendanceEdit> {
                 ),
               ],
             ),
+            SizedBox(height: 40),
             ElevatedButton(
               onPressed: () async {
                 DateTime? aux = await showOmniDateTimePicker(
@@ -80,6 +81,7 @@ class _AttendanceEditState extends State<AttendanceEdit> {
               },
               child: Text("Selecciona la fecha"),
             ),
+            SizedBox(height: 50),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
@@ -94,41 +96,41 @@ class _AttendanceEditState extends State<AttendanceEdit> {
                           ),
                         ),
                       );
-                    } else {
-                      if (await Provider.of<AttendanceViewModel>(
+                      return;
+                    }
+                    if (await Provider.of<AttendanceViewModel>(
+                      context,
+                      listen: false,
+                    ).checkRegisteredTypesAttendances(newDate!, type)) {
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text(
+                              'Ya existe una asistencia de este tipo para la fecha seleccionada.',
+                            ),
+                          ),
+                        );
+                      }
+                      return;
+                    }
+                    if (context.mounted) {
+                      Attendance att = Attendance(
+                        id: id,
+                        type: type,
+                        date: newDate ?? DateTime.now(),
+                      );
+                      Provider.of<AttendanceViewModel>(
                         context,
                         listen: false,
-                      ).checkRegisteredTypesAttendances(newDate!, type)) {
-                        if (context.mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text(
-                                'Ya existe una asistencia de este tipo para la fecha seleccionada.',
-                              ),
-                            ),
-                          );
-                        }
-                      } else {
-                        if (context.mounted) {
-                          Attendance att = Attendance(
-                            id: id,
-                            type: type,
-                            date: newDate ?? DateTime.now(),
-                          );
-                          Provider.of<AttendanceViewModel>(
-                            context,
-                            listen: false,
-                          ).updateAttendance(att);
+                      ).updateAttendance(att);
 
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(
-                                'Asistencia actualizada con la fecha ${att.date.toString()}',
-                              ),
-                            ),
-                          );
-                        }
-                      }
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            'Asistencia actualizada con el tipo ${att.type} y la fecha ${att.date.toString()}',
+                          ),
+                        ),
+                      );
                     }
                   },
                   child: Text("Guardar Cambios"),
@@ -139,6 +141,12 @@ class _AttendanceEditState extends State<AttendanceEdit> {
                       context,
                       listen: false,
                     ).deleteAttendance(id);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: const Text('Asistencia eliminada'),
+                        duration: const Duration(seconds: 2),
+                      ),
+                    );
                     Navigator.pop(context);
                   },
                   child: Text("Eliminar Asistencia"),

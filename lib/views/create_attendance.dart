@@ -1,12 +1,18 @@
+import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:group_button/group_button.dart';
 import 'package:horarios_app/models/attendance.dart';
 import 'package:horarios_app/view_model/attendance_view_model.dart';
 import 'package:provider/provider.dart';
 
-class CreateAttendance extends StatelessWidget {
+class CreateAttendance extends StatefulWidget {
   const CreateAttendance({super.key});
 
+  @override
+  State<CreateAttendance> createState() => _CreateAttendanceState();
+}
+
+class _CreateAttendanceState extends State<CreateAttendance> {
   @override
   Widget build(BuildContext context) {
     String type = '';
@@ -36,6 +42,11 @@ class CreateAttendance extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
+                const Text(
+                  'Registrar nueva asistencia',
+                  style: TextStyle(fontSize: 24),
+                ),
+                SizedBox(height: 40),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
@@ -68,17 +79,15 @@ class CreateAttendance extends StatelessWidget {
                     ),
                   ],
                 ),
-                const Text(
-                  'Registrar nueva asistencia',
-                  style: TextStyle(fontSize: 24),
-                ),
                 const SizedBox(height: 20),
                 ElevatedButton(
                   onPressed: () async {
-                    if(type.isEmpty) {
+                    if (type.isEmpty) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(
-                          content: Text('Por favor, selecciona un tipo de asistencia.'),
+                          content: Text(
+                            'Por favor, selecciona un tipo de asistencia.',
+                          ),
                         ),
                       );
                       return;
@@ -88,7 +97,7 @@ class CreateAttendance extends StatelessWidget {
                       date,
                       type,
                     )) {
-                      if(context.mounted){
+                      if (context.mounted) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
                             content: Text(
@@ -97,36 +106,54 @@ class CreateAttendance extends StatelessWidget {
                           ),
                         );
                       }
-                    } else {
-                      if (context.mounted) {
-                        Attendance att = Attendance(type: type, date: date);
-                        Provider.of<AttendanceViewModel>(
-                          context,
-                          listen: false,
-                        ).createAttendance(att);
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: const Text('Asistencia registrada'),
-                            duration: const Duration(seconds: 2),
-                          ),
-                        );
-                      }
+                      return;
+                    }
+                    if (context.mounted) {
+                      Attendance att = Attendance(type: type, date: date);
+                      Provider.of<AttendanceViewModel>(
+                        context,
+                        listen: false,
+                      ).createAttendance(att);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: const Text('Asistencia registrada'),
+                          duration: const Duration(seconds: 2),
+                        ),
+                      );
                     }
                   },
                   child: const Text('Registrar'),
                 ),
                 ElevatedButton(
                   onPressed: () {
-                    Provider.of<AttendanceViewModel>(
-                      context,
-                      listen: false,
-                    ).deleteAllData();
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: const Text('Todas las asistencias borradas'),
-                        duration: const Duration(seconds: 2),
-                      ),
-                    );
+                    AwesomeDialog(
+                      context: context,
+                      dialogType: DialogType.warning,
+                      animType: AnimType.scale,
+                      headerAnimationLoop: true,
+                      title: "Precaución",
+                      desc: "¿Quieres borrar todas las Asistencias?",
+                      showCloseIcon: true,
+                      btnCancelText: "No",
+                      btnOkText: "Si",
+                      btnCancelOnPress: () {
+                        
+                      },
+                      btnOkOnPress: ()  {
+                        Provider.of<AttendanceViewModel>(
+                          context,
+                          listen: false,
+                        ).deleteAllData();
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: const Text(
+                              'Todas las asistencias borradas',
+                            ),
+                            duration: const Duration(seconds: 2),
+                          ),
+                        );
+                      },
+                    ).show();
                   },
                   child: Text("Borrar todas las asistencias"),
                 ),

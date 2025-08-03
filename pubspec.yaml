@@ -41,6 +41,21 @@ dependencies:
   provider: ^6.1.5
   delightful_toast: ^1.1.0
   omni_datetime_picker: ^2.2.0
+  launcher_name: ^1.0.2
+  icons_launcher: ^3.0.1
+  awesome_dialog: ^3.2.1
+
+launcher_name:
+  default: "Horarios INE"
+  es: "Horarios INE"
+
+icons_launcher:
+  image_path: "assets/INE.jpg"
+  platforms:
+    android:
+      enable: true
+    ios:
+      enable: true
 
 dev_dependencies:
   flutter_test:

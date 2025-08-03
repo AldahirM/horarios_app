@@ -18,14 +18,14 @@ class _InsertAttendanceState extends State<InsertAttendance> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Editar Asistencia'),
-      ),
+      appBar: AppBar(title: const Text('Insertar Asistencia')),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
+            const Text("Insertar Asistencia", style: TextStyle(fontSize: 24)),
+            SizedBox(height: 35),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
@@ -58,6 +58,7 @@ class _InsertAttendanceState extends State<InsertAttendance> {
                 ),
               ],
             ),
+            SizedBox(height: 30),
             ElevatedButton(
               onPressed: () async {
                 DateTime? aux = await showOmniDateTimePicker(
@@ -90,39 +91,36 @@ class _InsertAttendanceState extends State<InsertAttendance> {
                           ),
                         ),
                       );
-                    } else {
-                      if (await Provider.of<AttendanceViewModel>(
+                      return;
+                    }
+                    if (await Provider.of<AttendanceViewModel>(
+                      context,
+                      listen: false,
+                    ).checkRegisteredTypesAttendances(newDate!, type)) {
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text(
+                              'Ya existe una asistencia de este tipo para la fecha seleccionada.',
+                            ),
+                          ),
+                        );
+                      }
+                      return;
+                    }
+                    Attendance att = Attendance(type: type, date: newDate!);
+                    if (context.mounted) {
+                      Provider.of<AttendanceViewModel>(
                         context,
                         listen: false,
-                      ).checkRegisteredTypesAttendances(newDate!, type)) {
-                        if (context.mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text(
-                                'Ya existe una asistencia de este tipo para la fecha seleccionada.',
-                              ),
-                            ),
-                          );
-                        }
-                      } else {
-                        if (context.mounted) {
-                          Attendance att = Attendance(
-                            type: type,
-                            date: newDate!,
-                          );
-                          Provider.of<AttendanceViewModel>(
-                            context,
-                            listen: false,
-                          ).createAttendance(att);
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(
-                                'Asistencia registrada con la fecha ${att.date.toString()}',
-                              ),
-                            ),
-                          );
-                        }
-                      }
+                      ).createAttendance(att);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            'Asistencia registrada con el tipo ${att.type} y la fecha ${att.date.toString()}',
+                          ),
+                        ),
+                      );
                     }
                   },
                   child: Text("Guardar"),

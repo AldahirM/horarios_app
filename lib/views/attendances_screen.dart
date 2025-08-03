@@ -49,7 +49,7 @@ class _AttendancesScreenState extends State<AttendancesScreen> {
           );
         },
       ),
-      floatingActionButton: FloatingActionButton(
+      /*floatingActionButton: FloatingActionButton(
         onPressed: () {
           Provider.of<AttendanceViewModel>(
             context,
@@ -57,7 +57,7 @@ class _AttendancesScreenState extends State<AttendancesScreen> {
           ).getAttendances();
         },
         child: const Icon(Icons.refresh),
-      ),
+      ),*/
     );
   }
 }
